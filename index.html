@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Арабша">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Арабша оқып үйрену</title>
+<style>
+:root{--bg:#f6f8f7;--card:#fff;--ink:#14211f;--muted:#6c7a77;--accent:#0f766e;--accent2:#dff3ef;--danger:#b42318;--line:#dfe7e5;--gold:#a86f00}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input{font:inherit} button{cursor:pointer}
+.app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:88px}
+.top{padding:calc(18px + env(safe-area-inset-top)) 18px 10px;background:linear-gradient(135deg,#0f766e,#115e59);color:#fff;position:sticky;top:0;z-index:8}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:21px;font-weight:800}.small{font-size:12px;opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:9px;text-align:center}.stat b{display:block;font-size:18px}
+main{padding:16px}.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 6px 18px rgba(20,33,31,.04)}
+h2,h3,p{margin-top:0}.muted{color:var(--muted)}.progress{height:10px;background:#e7efed;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:var(--accent);width:0}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:12px}.hero .big{font-size:25px;font-weight:800}
+.btn{border:0;border-radius:14px;padding:12px 14px;font-weight:750;background:var(--accent);color:white}.btn.secondary{background:var(--accent2);color:var(--accent)}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.danger{background:#fff0ee;color:var(--danger)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wordcard{text-align:center;padding:22px 15px}.arabic{direction:rtl;font-family:"Geeza Pro","Noto Naskh Arabic","Arial",serif;font-size:48px;line-height:1.5;font-weight:700}.translit{font-size:18px;font-weight:700}.meaning{font-size:18px;color:var(--muted)}
+.cat{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.cat:last-child{border-bottom:0}.pill{font-size:12px;background:#eef5f3;border-radius:99px;padding:4px 8px;color:#31524c}
+nav{position:fixed;z-index:10;left:50%;transform:translateX(-50%);bottom:0;max-width:760px;width:100%;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:7px 5px calc(7px + env(safe-area-inset-bottom))}
+nav button{border:0;background:transparent;padding:6px 2px;color:#66726f;font-size:11px}nav button b{display:block;font-size:19px;margin-bottom:2px}nav button.active{color:var(--accent);font-weight:800}
+.screen{display:none}.screen.active{display:block}.center{text-align:center}
+.quizopt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:white;padding:13px;border-radius:14px;margin:8px 0}.quizopt.good{border-color:#16a34a;background:#ecfdf3}.quizopt.bad{border-color:#dc2626;background:#fff1f2}
+input[type=text],input[type=search]{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line);background:#fff;outline:none}input:focus{border-color:#74b7ae}
+.dialog{white-space:pre-line}.dialog .ar{direction:rtl;font-size:25px;line-height:1.9;font-family:"Geeza Pro","Noto Naskh Arabic",serif}.listword{display:grid;grid-template-columns:1.1fr 1fr 1.2fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}.listword .ar{direction:rtl;font-size:22px;font-weight:700}.tag{display:inline-block;font-size:11px;background:#fff7db;color:#7b5300;padding:4px 8px;border-radius:99px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:95px;background:#1f2e2b;color:#fff;padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:30}.toast.show{opacity:1}
+@media(max-width:430px){.arabic{font-size:42px}.grid3{grid-template-columns:1fr}.listword{grid-template-columns:1fr}.stats .stat{padding:8px 4px}.stat b{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="toprow"><div><div class="brand">Арабша оқып үйрену</div><div class="small">Күн сайын аз-аздан, тұрақты түрде</div></div><div id="levelBadge">1-деңгей</div></div>
+  <div class="stats">
+    <div class="stat"><b id="xp">0</b>XP</div>
+    <div class="stat"><b id="streak">0 🔥</b>серия</div>
+    <div class="stat"><b id="known">0/300</b>сөз</div>
+  </div>
+</header>
+
+<main>
+<section id="home" class="screen active">
+  <div class="panel">
+    <div class="hero"><div><div class="muted">Бүгінгі сабақ</div><div class="big"><span id="dailyDone">0</span>/10 сөз</div></div><button class="btn" onclick="startLesson()">Сабақты бастау</button></div>
+    <div class="progress" style="margin-top:14px"><i id="dailyBar"></i></div>
+  </div>
+  <div class="grid2">
+    <div class="panel center"><div style="font-size:27px">🧠</div><b>Қайталау</b><p class="muted" id="repeatCount">0 қиын сөз</p><button class="btn secondary" onclick="startDifficult()">Қайталау</button></div>
+    <div class="panel center"><div style="font-size:27px">💬</div><b>Диалогтар</b><p class="muted">30 шағын диалог</p><button class="btn secondary" onclick="go('dialogs')">Ашу</button></div>
+  </div>
+  <div class="panel">
+    <h3>Бөлімдер</h3>
+    <div id="catList"></div>
+  </div>
+</section>
+
+<section id="lesson" class="screen">
+  <div class="panel wordcard">
+    <div class="muted" id="lessonCat"></div>
+    <div class="arabic" id="lessonAr">...</div>
+    <div class="translit" id="lessonTr"></div>
+    <div class="meaning" id="lessonKz"></div>
+    <button class="btn secondary" onclick="speakCurrent()" style="margin-top:14px">🔊 Тыңдау</button>
+  </div>
+  <div class="grid2">
+    <button class="btn danger" onclick="markRepeat()">🔁 Қайталау керек</button>
+    <button class="btn" onclick="markKnown()">✅ Білемін</button>
+  </div>
+  <div class="panel center" style="margin-top:14px"><span class="muted">Сабақ: </span><b><span id="lessonIndex">1</span>/<span id="lessonTotal">10</span></b></div>
+</section>
+
+<section id="quiz" class="screen">
+  <div class="panel">
+    <div class="muted center">Дұрыс аударманы таңда</div>
+    <div class="arabic center" id="quizAr"></div>
+    <div id="quizOptions"></div>
+  </div>
+  <button class="btn" id="quizNext" onclick="nextQuiz()" style="width:100%;display:none">Келесі</button>
+  <div class="panel" style="margin-top:14px">
+    <div class="muted">Арабшасын өзің теріп көр</div>
+    <h3 id="typeKz"></h3>
+    <input id="typeInput" type="text" dir="rtl" placeholder="Арабша жаз...">
+    <button class="btn secondary" onclick="checkTyped()" style="margin-top:10px;width:100%">Тексеру</button>
+    <div id="typeResult" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<section id="words" class="screen">
+  <div class="panel"><input id="search" type="search" placeholder="Арабша, қазақша немесе оқылуы..." oninput="renderWords()"></div>
+  <div class="panel"><div id="wordList"></div></div>
+</section>
+
+<section id="dialogs" class="screen">
+  <div class="panel"><h3>30 диалог</h3><p class="muted">Үйренген сөздеріңді сөйлем ішінде көр.</p></div>
+  <div id="dialogList"></div>
+</section>
+
+<section id="saved" class="screen">
+  <div class="panel"><h3>Менің сөздерім</h3><p class="muted">Қиын деп белгілеген сөздер осында жиналады.</p></div>
+  <div class="panel"><div id="savedList"></div></div>
+</section>
+</main>
+
+<nav>
+<button data-go="home" class="active" onclick="go('home')"><b>🏠</b>Басты бет</button>
+<button data-go="quiz" onclick="go('quiz')"><b>🎯</b>Тест</button>
+<button data-go="words" onclick="go('words')"><b>📚</b>Сөздер</button>
+<button data-go="dialogs" onclick="go('dialogs')"><b>💬</b>Диалог</button>
+<button data-go="saved" onclick="go('saved')"><b>⭐</b>Менің</button>
+</nav>
+<div class="toast" id="toast"></div>
+</div>
+<script>
+const WORDS = [{"id": 1, "cat": "Сәлемдесу", "ar": "مَرْحَبًا", "tr": "мархабан", "kz": "сәлем"}, {"id": 2, "cat": "Сәлемдесу", "ar": "السَّلَامُ عَلَيْكُمْ", "tr": "әс-сәләму аләйкум", "kz": "Ассалаумағалейкум"}, {"id": 3, "cat": "Сәлемдесу", "ar": "وَعَلَيْكُمُ السَّلَامُ", "tr": "уа аләйкумус-сәләм", "kz": "Уағалейкумассалам"}, {"id": 4, "cat": "Сәлемдесу", "ar": "صَبَاحُ الْخَيْرِ", "tr": "сабахул-хайр", "kz": "қайырлы таң"}, {"id": 5, "cat": "Сәлемдесу", "ar": "مَسَاءُ الْخَيْرِ", "tr": "мәсәул-хайр", "kz": "қайырлы кеш"}, {"id": 6, "cat": "Сәлемдесу", "ar": "أَهْلًا وَسَهْلًا", "tr": "әһлән уә сәһлән", "kz": "қош келдіңіз"}, {"id": 7, "cat": "Сәлемдесу", "ar": "كَيْفَ حَالُكَ؟", "tr": "кайфа халука?", "kz": "халің қалай? (ер адамға)"}, {"id": 8, "cat": "Сәлемдесу", "ar": "كَيْفَ حَالُكِ؟", "tr": "кайфа халуки?", "kz": "халің қалай? (әйелге)"}, {"id": 9, "cat": "Сәлемдесу", "ar": "بِخَيْرٍ", "tr": "бихайрин", "kz": "жақсы"}, {"id": 10, "cat": "Сәлемдесу", "ar": "الْحَمْدُ لِلّٰهِ", "tr": "әлхамду лилләһ", "kz": "Аллаға шүкір"}, {"id": 11, "cat": "Сәлемдесу", "ar": "شُكْرًا", "tr": "шукран", "kz": "рақмет"}, {"id": 12, "cat": "Сәлемдесу", "ar": "عَفْوًا", "tr": "афуан", "kz": "оқасы жоқ / кешіріңіз"}, {"id": 13, "cat": "Сәлемдесу", "ar": "مِنْ فَضْلِكَ", "tr": "мин фадлика", "kz": "өтінемін (ер адамға)"}, {"id": 14, "cat": "Сәлемдесу", "ar": "مِنْ فَضْلِكِ", "tr": "мин фадлики", "kz": "өтінемін (әйелге)"}, {"id": 15, "cat": "Сәлемдесу", "ar": "نَعَمْ", "tr": "нағам", "kz": "иә"}, {"id": 16, "cat": "Сәлемдесу", "ar": "لَا", "tr": "лә", "kz": "жоқ"}, {"id": 17, "cat": "Сәлемдесу", "ar": "حَسَنًا", "tr": "хасанан", "kz": "жақсы / жарайды"}, {"id": 18, "cat": "Сәлемдесу", "ar": "مَعَ السَّلَامَةِ", "tr": "мағас-сәләма", "kz": "сау болыңыз"}, {"id": 19, "cat": "Сәлемдесу", "ar": "إِلَى اللِّقَاءِ", "tr": "иләл-лиқа", "kz": "кездескенше"}, {"id": 20, "cat": "Сәлемдесу", "ar": "آسِفٌ", "tr": "асифун", "kz": "кешіріңіз / өкінемін"}, {"id": 21, "cat": "Отбасы", "ar": "أَبٌ", "tr": "әбун", "kz": "әке"}, {"id": 22, "cat": "Отбасы", "ar": "أُمٌّ", "tr": "уммун", "kz": "ана"}, {"id": 23, "cat": "Отбасы", "ar": "وَالِدٌ", "tr": "уәлидун", "kz": "әке / ата-анадағы әке"}, {"id": 24, "cat": "Отбасы", "ar": "وَالِدَةٌ", "tr": "уәлидатун", "kz": "ана / ата-анадағы ана"}, {"id": 25, "cat": "Отбасы", "ar": "أَخٌ", "tr": "ахун", "kz": "аға / іні"}, {"id": 26, "cat": "Отбасы", "ar": "أُخْتٌ", "tr": "ухтун", "kz": "әпке / сіңлі"}, {"id": 27, "cat": "Отбасы", "ar": "جَدٌّ", "tr": "жаддун", "kz": "ата"}, {"id": 28, "cat": "Отбасы", "ar": "جَدَّةٌ", "tr": "жаддатун", "kz": "әже"}, {"id": 29, "cat": "Отбасы", "ar": "زَوْجٌ", "tr": "заужун", "kz": "күйеу"}, {"id": 30, "cat": "Отбасы", "ar": "زَوْجَةٌ", "tr": "заужатун", "kz": "әйел / жұбай"}, {"id": 31, "cat": "Отбасы", "ar": "اِبْنٌ", "tr": "ибнун", "kz": "ұл"}, {"id": 32, "cat": "Отбасы", "ar": "اِبْنَةٌ", "tr": "ибнатун", "kz": "қыз"}, {"id": 33, "cat": "Отбасы", "ar": "طِفْلٌ", "tr": "тифлун", "kz": "бала"}, {"id": 34, "cat": "Отбасы", "ar": "أُسْرَةٌ", "tr": "усратун", "kz": "отбасы"}, {"id": 35, "cat": "Отбасы", "ar": "عَمٌّ", "tr": "ғаммун", "kz": "әке жағынан көке"}, {"id": 36, "cat": "Отбасы", "ar": "عَمَّةٌ", "tr": "ғамматун", "kz": "әке жағынан тәте"}, {"id": 37, "cat": "Отбасы", "ar": "خَالٌ", "tr": "халун", "kz": "ана жағынан нағашы аға"}, {"id": 38, "cat": "Отбасы", "ar": "خَالَةٌ", "tr": "халатун", "kz": "ана жағынан нағашы тәте"}, {"id": 39, "cat": "Отбасы", "ar": "حَفِيدٌ", "tr": "хафидун", "kz": "немере"}, {"id": 40, "cat": "Отбасы", "ar": "قَرِيبٌ", "tr": "қарибун", "kz": "туыс / жақын"}, {"id": 41, "cat": "Үй", "ar": "بَيْتٌ", "tr": "бәйтун", "kz": "үй"}, {"id": 42, "cat": "Үй", "ar": "غُرْفَةٌ", "tr": "ғурфатун", "kz": "бөлме"}, {"id": 43, "cat": "Үй", "ar": "بَابٌ", "tr": "бәбун", "kz": "есік"}, {"id": 44, "cat": "Үй", "ar": "نَافِذَةٌ", "tr": "нәфизатун", "kz": "терезе"}, {"id": 45, "cat": "Үй", "ar": "سَرِيرٌ", "tr": "сарирун", "kz": "төсек"}, {"id": 46, "cat": "Үй", "ar": "كُرْسِيٌّ", "tr": "курсийюн", "kz": "орындық"}, {"id": 47, "cat": "Үй", "ar": "طَاوِلَةٌ", "tr": "тауилатун", "kz": "үстел"}, {"id": 48, "cat": "Үй", "ar": "مَطْبَخٌ", "tr": "матбахун", "kz": "ас үй"}, {"id": 49, "cat": "Үй", "ar": "حَمَّامٌ", "tr": "хаммамун", "kz": "жуынатын бөлме"}, {"id": 50, "cat": "Үй", "ar": "مِفْتَاحٌ", "tr": "мифтахун", "kz": "кілт"}, {"id": 51, "cat": "Үй", "ar": "مِصْبَاحٌ", "tr": "мисбахун", "kz": "шам"}, {"id": 52, "cat": "Үй", "ar": "ثَلَّاجَةٌ", "tr": "сәлләжатун", "kz": "тоңазытқыш"}, {"id": 53, "cat": "Үй", "ar": "فُرْنٌ", "tr": "фурнун", "kz": "пеш"}, {"id": 54, "cat": "Үй", "ar": "سَجَّادَةٌ", "tr": "сажжадатун", "kz": "кілем"}, {"id": 55, "cat": "Үй", "ar": "خِزَانَةٌ", "tr": "хизанатун", "kz": "шкаф"}, {"id": 56, "cat": "Үй", "ar": "جِدَارٌ", "tr": "жидарун", "kz": "қабырға"}, {"id": 57, "cat": "Үй", "ar": "سَقْفٌ", "tr": "сақфун", "kz": "төбе"}, {"id": 58, "cat": "Үй", "ar": "أَرْضٌ", "tr": "ардун", "kz": "еден / жер"}, {"id": 59, "cat": "Үй", "ar": "دَرَجٌ", "tr": "даражун", "kz": "баспалдақ"}, {"id": 60, "cat": "Үй", "ar": "شُرْفَةٌ", "tr": "шурфатун", "kz": "балкон"}, {"id": 61, "cat": "Тамақ", "ar": "مَاءٌ", "tr": "мәун", "kz": "су"}, {"id": 62, "cat": "Тамақ", "ar": "خُبْزٌ", "tr": "хубзун", "kz": "нан"}, {"id": 63, "cat": "Тамақ", "ar": "أَرُزٌّ", "tr": "аруззун", "kz": "күріш"}, {"id": 64, "cat": "Тамақ", "ar": "لَحْمٌ", "tr": "лахмун", "kz": "ет"}, {"id": 65, "cat": "Тамақ", "ar": "دَجَاجٌ", "tr": "дажажун", "kz": "тауық еті"}, {"id": 66, "cat": "Тамақ", "ar": "سَمَكٌ", "tr": "самакун", "kz": "балық"}, {"id": 67, "cat": "Тамақ", "ar": "حَلِيبٌ", "tr": "халибун", "kz": "сүт"}, {"id": 68, "cat": "Тамақ", "ar": "شَايٌ", "tr": "шәйун", "kz": "шай"}, {"id": 69, "cat": "Тамақ", "ar": "قَهْوَةٌ", "tr": "қаһуатун", "kz": "кофе"}, {"id": 70, "cat": "Тамақ", "ar": "سُكَّرٌ", "tr": "суккарун", "kz": "қант"}, {"id": 71, "cat": "Тамақ", "ar": "مِلْحٌ", "tr": "милхун", "kz": "тұз"}, {"id": 72, "cat": "Тамақ", "ar": "تُفَّاحٌ", "tr": "туффахун", "kz": "алма"}, {"id": 73, "cat": "Тамақ", "ar": "مَوْزٌ", "tr": "маузун", "kz": "банан"}, {"id": 74, "cat": "Тамақ", "ar": "بُرْتُقَالٌ", "tr": "буртуқалун", "kz": "апельсин"}, {"id": 75, "cat": "Тамақ", "ar": "تَمْرٌ", "tr": "тамрун", "kz": "құрма"}, {"id": 76, "cat": "Тамақ", "ar": "بَيْضٌ", "tr": "байдун", "kz": "жұмыртқа"}, {"id": 77, "cat": "Тамақ", "ar": "جُبْنٌ", "tr": "жубнун", "kz": "ірімшік"}, {"id": 78, "cat": "Тамақ", "ar": "حَسَاءٌ", "tr": "хасаун", "kz": "сорпа"}, {"id": 79, "cat": "Тамақ", "ar": "سَلَطَةٌ", "tr": "салататун", "kz": "салат"}, {"id": 80, "cat": "Тамақ", "ar": "طَعَامٌ", "tr": "тағамун", "kz": "тамақ"}, {"id": 81, "cat": "Сандар", "ar": "وَاحِدٌ", "tr": "уахидун", "kz": "бір"}, {"id": 82, "cat": "Сандар", "ar": "اِثْنَانِ", "tr": "иснәни", "kz": "екі"}, {"id": 83, "cat": "Сандар", "ar": "ثَلَاثَةٌ", "tr": "саләсатун", "kz": "үш"}, {"id": 84, "cat": "Сандар", "ar": "أَرْبَعَةٌ", "tr": "арбағатун", "kz": "төрт"}, {"id": 85, "cat": "Сандар", "ar": "خَمْسَةٌ", "tr": "хамсатун", "kz": "бес"}, {"id": 86, "cat": "Сандар", "ar": "سِتَّةٌ", "tr": "ситтатун", "kz": "алты"}, {"id": 87, "cat": "Сандар", "ar": "سَبْعَةٌ", "tr": "сабғатун", "kz": "жеті"}, {"id": 88, "cat": "Сандар", "ar": "ثَمَانِيَةٌ", "tr": "самәниятун", "kz": "сегіз"}, {"id": 89, "cat": "Сандар", "ar": "تِسْعَةٌ", "tr": "тисғатун", "kz": "тоғыз"}, {"id": 90, "cat": "Сандар", "ar": "عَشَرَةٌ", "tr": "ашаратун", "kz": "он"}, {"id": 91, "cat": "Сандар", "ar": "أَحَدَ عَشَرَ", "tr": "ахада ашара", "kz": "он бір"}, {"id": 92, "cat": "Сандар", "ar": "اِثْنَا عَشَرَ", "tr": "исна ашара", "kz": "он екі"}, {"id": 93, "cat": "Сандар", "ar": "ثَلَاثَةَ عَشَرَ", "tr": "саләсата ашара", "kz": "он үш"}, {"id": 94, "cat": "Сандар", "ar": "أَرْبَعَةَ عَشَرَ", "tr": "арбағата ашара", "kz": "он төрт"}, {"id": 95, "cat": "Сандар", "ar": "خَمْسَةَ عَشَرَ", "tr": "хамсата ашара", "kz": "он бес"}, {"id": 96, "cat": "Сандар", "ar": "سِتَّةَ عَشَرَ", "tr": "ситтата ашара", "kz": "он алты"}, {"id": 97, "cat": "Сандар", "ar": "سَبْعَةَ عَشَرَ", "tr": "сабғата ашара", "kz": "он жеті"}, {"id": 98, "cat": "Сандар", "ar": "ثَمَانِيَةَ عَشَرَ", "tr": "самәнията ашара", "kz": "он сегіз"}, {"id": 99, "cat": "Сандар", "ar": "تِسْعَةَ عَشَرَ", "tr": "тисғата ашара", "kz": "он тоғыз"}, {"id": 100, "cat": "Сандар", "ar": "عِشْرُونَ", "tr": "ишруна", "kz": "жиырма"}, {"id": 101, "cat": "Уақыт", "ar": "وَقْتٌ", "tr": "уақтун", "kz": "уақыт"}, {"id": 102, "cat": "Уақыт", "ar": "يَوْمٌ", "tr": "йәумун", "kz": "күн"}, {"id": 103, "cat": "Уақыт", "ar": "أُسْبُوعٌ", "tr": "усбуғун", "kz": "апта"}, {"id": 104, "cat": "Уақыт", "ar": "شَهْرٌ", "tr": "шаһрун", "kz": "ай"}, {"id": 105, "cat": "Уақыт", "ar": "سَنَةٌ", "tr": "санатун", "kz": "жыл"}, {"id": 106, "cat": "Уақыт", "ar": "سَاعَةٌ", "tr": "сағатун", "kz": "сағат"}, {"id": 107, "cat": "Уақыт", "ar": "دَقِيقَةٌ", "tr": "дақиқатун", "kz": "минут"}, {"id": 108, "cat": "Уақыт", "ar": "ثَانِيَةٌ", "tr": "саниятун", "kz": "секунд"}, {"id": 109, "cat": "Уақыт", "ar": "الْيَوْمَ", "tr": "әл-йәума", "kz": "бүгін"}, {"id": 110, "cat": "Уақыт", "ar": "غَدًا", "tr": "ғадан", "kz": "ертең"}, {"id": 111, "cat": "Уақыт", "ar": "أَمْسِ", "tr": "әмси", "kz": "кеше"}, {"id": 112, "cat": "Уақыт", "ar": "الآنَ", "tr": "әл-әәнә", "kz": "қазір"}, {"id": 113, "cat": "Уақыт", "ar": "صَبَاحٌ", "tr": "сабахун", "kz": "таң"}, {"id": 114, "cat": "Уақыт", "ar": "مَسَاءٌ", "tr": "мәсәун", "kz": "кеш"}, {"id": 115, "cat": "Уақыт", "ar": "لَيْلٌ", "tr": "ләйлун", "kz": "түн"}, {"id": 116, "cat": "Уақыт", "ar": "ظُهْرٌ", "tr": "зуһрун", "kz": "түскі уақыт"}, {"id": 117, "cat": "Уақыт", "ar": "بَاكِرًا", "tr": "бәкиран", "kz": "ерте"}, {"id": 118, "cat": "Уақыт", "ar": "مُتَأَخِّرًا", "tr": "мутааххиран", "kz": "кеш"}, {"id": 119, "cat": "Уақыт", "ar": "مَتَى؟", "tr": "мата?", "kz": "қашан?"}, {"id": 120, "cat": "Уақыт", "ar": "كَمِ السَّاعَةُ؟", "tr": "камис-сағату?", "kz": "сағат қанша?"}, {"id": 121, "cat": "Дүкен", "ar": "سُوقٌ", "tr": "суқун", "kz": "базар"}, {"id": 122, "cat": "Дүкен", "ar": "مَتْجَرٌ", "tr": "матжарун", "kz": "дүкен"}, {"id": 123, "cat": "Дүкен", "ar": "سِعْرٌ", "tr": "сиғрун", "kz": "баға"}, {"id": 124, "cat": "Дүкен", "ar": "مَالٌ", "tr": "малун", "kz": "ақша"}, {"id": 125, "cat": "Дүкен", "ar": "نَقْدٌ", "tr": "нақдун", "kz": "қолма-қол ақша"}, {"id": 126, "cat": "Дүкен", "ar": "بَطَاقَةٌ", "tr": "битағатун", "kz": "карта"}, {"id": 127, "cat": "Дүкен", "ar": "رَخِيصٌ", "tr": "рахисун", "kz": "арзан"}, {"id": 128, "cat": "Дүкен", "ar": "غَالٍ", "tr": "ғалин", "kz": "қымбат"}, {"id": 129, "cat": "Дүкен", "ar": "كَمْ؟", "tr": "кам?", "kz": "қанша?"}, {"id": 130, "cat": "Дүкен", "ar": "هٰذَا", "tr": "һәза", "kz": "мынау (ер текті)"}, {"id": 131, "cat": "Дүкен", "ar": "هٰذِهِ", "tr": "һәзиһи", "kz": "мынау (әйел текті)"}, {"id": 132, "cat": "Дүкен", "ar": "أُرِيدُ", "tr": "уриду", "kz": "мен қалаймын"}, {"id": 133, "cat": "Дүкен", "ar": "لَا أُرِيدُ", "tr": "лә уриду", "kz": "мен қаламаймын"}, {"id": 134, "cat": "Дүкен", "ar": "أَشْتَرِي", "tr": "әштари", "kz": "мен сатып аламын"}, {"id": 135, "cat": "Дүкен", "ar": "أَبِيعُ", "tr": "әбиғу", "kz": "мен сатамын"}, {"id": 136, "cat": "Дүкен", "ar": "كِيسٌ", "tr": "кисун", "kz": "пакет"}, {"id": 137, "cat": "Дүкен", "ar": "فَاتُورَةٌ", "tr": "фатуратун", "kz": "чек / шот"}, {"id": 138, "cat": "Дүкен", "ar": "خَصْمٌ", "tr": "хасмун", "kz": "жеңілдік"}, {"id": 139, "cat": "Дүкен", "ar": "مَقَاسٌ", "tr": "мақасун", "kz": "өлшем"}, {"id": 140, "cat": "Дүкен", "ar": "لَوْنٌ", "tr": "ләунун", "kz": "түс"}, {"id": 141, "cat": "Жол / саяхат", "ar": "طَرِيقٌ", "tr": "тариқун", "kz": "жол"}, {"id": 142, "cat": "Жол / саяхат", "ar": "شَارِعٌ", "tr": "шариғун", "kz": "көше"}, {"id": 143, "cat": "Жол / саяхат", "ar": "سَيَّارَةٌ", "tr": "сайяратун", "kz": "көлік"}, {"id": 144, "cat": "Жол / саяхат", "ar": "حَافِلَةٌ", "tr": "хафилатун", "kz": "автобус"}, {"id": 145, "cat": "Жол / саяхат", "ar": "طَائِرَةٌ", "tr": "тааиратун", "kz": "ұшақ"}, {"id": 146, "cat": "Жол / саяхат", "ar": "مَطَارٌ", "tr": "матарун", "kz": "әуежай"}, {"id": 147, "cat": "Жол / саяхат", "ar": "مَحَطَّةٌ", "tr": "махаттатун", "kz": "бекет"}, {"id": 148, "cat": "Жол / саяхат", "ar": "فُنْدُقٌ", "tr": "фундуқун", "kz": "қонақүй"}, {"id": 149, "cat": "Жол / саяхат", "ar": "جَوَازُ سَفَرٍ", "tr": "жауазу сафарин", "kz": "паспорт"}, {"id": 150, "cat": "Жол / саяхат", "ar": "تَذْكِرَةٌ", "tr": "тазкиратун", "kz": "билет"}, {"id": 151, "cat": "Жол / саяхат", "ar": "يَمِينٌ", "tr": "яминун", "kz": "оң жақ"}, {"id": 152, "cat": "Жол / саяхат", "ar": "يَسَارٌ", "tr": "ясарун", "kz": "сол жақ"}, {"id": 153, "cat": "Жол / саяхат", "ar": "مُسْتَقِيمٌ", "tr": "мустақимун", "kz": "тура"}, {"id": 154, "cat": "Жол / саяхат", "ar": "بَعِيدٌ", "tr": "бағидун", "kz": "алыс"}, {"id": 155, "cat": "Жол / саяхат", "ar": "خَرِيطَةٌ", "tr": "харитатун", "kz": "карта"}, {"id": 156, "cat": "Жол / саяхат", "ar": "مَدِينَةٌ", "tr": "мадинатун", "kz": "қала"}, {"id": 157, "cat": "Жол / саяхат", "ar": "قَرْيَةٌ", "tr": "қарятун", "kz": "ауыл"}, {"id": 158, "cat": "Жол / саяхат", "ar": "سَفَرٌ", "tr": "сафарун", "kz": "сапар"}, {"id": 159, "cat": "Жол / саяхат", "ar": "رِحْلَةٌ", "tr": "рихлатун", "kz": "саяхат / сапар"}, {"id": 160, "cat": "Жол / саяхат", "ar": "أَيْنَ؟", "tr": "әйна?", "kz": "қайда?"}, {"id": 161, "cat": "Мешіт", "ar": "مَسْجِدٌ", "tr": "масжидун", "kz": "мешіт"}, {"id": 162, "cat": "Мешіт", "ar": "إِمَامٌ", "tr": "имамун", "kz": "имам"}, {"id": 163, "cat": "Мешіт", "ar": "مُؤَذِّنٌ", "tr": "муаззинун", "kz": "азаншы"}, {"id": 164, "cat": "Мешіт", "ar": "أَذَانٌ", "tr": "азанун", "kz": "азан"}, {"id": 165, "cat": "Мешіт", "ar": "إِقَامَةٌ", "tr": "иқаматун", "kz": "қамат"}, {"id": 166, "cat": "Мешіт", "ar": "مُصَلًّى", "tr": "мусаллан", "kz": "намаз оқитын орын"}, {"id": 167, "cat": "Мешіт", "ar": "مِحْرَابٌ", "tr": "михрабун", "kz": "михраб"}, {"id": 168, "cat": "Мешіт", "ar": "مِنْبَرٌ", "tr": "минбарун", "kz": "мінбер"}, {"id": 169, "cat": "Мешіт", "ar": "قُرْآنٌ", "tr": "қуръанун", "kz": "Құран"}, {"id": 170, "cat": "Мешіт", "ar": "مُصْحَفٌ", "tr": "мусхафун", "kz": "мұсхаф"}, {"id": 171, "cat": "Мешіт", "ar": "دُعَاءٌ", "tr": "дуғаун", "kz": "дұға"}, {"id": 172, "cat": "Мешіт", "ar": "ذِكْرٌ", "tr": "зикрун", "kz": "зікір"}, {"id": 173, "cat": "Мешіт", "ar": "سُبْحَةٌ", "tr": "субхатун", "kz": "тәспі"}, {"id": 174, "cat": "Мешіт", "ar": "وُضُوءٌ", "tr": "удууун", "kz": "дәрет"}, {"id": 175, "cat": "Мешіт", "ar": "قِبْلَةٌ", "tr": "қиблатун", "kz": "құбыла"}, {"id": 176, "cat": "Мешіт", "ar": "جَمَاعَةٌ", "tr": "жамағатун", "kz": "жамағат"}, {"id": 177, "cat": "Мешіт", "ar": "خُطْبَةٌ", "tr": "хутбатун", "kz": "құтпа"}, {"id": 178, "cat": "Мешіт", "ar": "جُمُعَةٌ", "tr": "жумуғатун", "kz": "жұма"}, {"id": 179, "cat": "Мешіт", "ar": "صَفٌّ", "tr": "саффун", "kz": "сап"}, {"id": 180, "cat": "Мешіт", "ar": "صَدَقَةٌ", "tr": "садақатун", "kz": "садақа"}, {"id": 181, "cat": "Намаз", "ar": "صَلَاةٌ", "tr": "салатун", "kz": "намаз"}, {"id": 182, "cat": "Намаз", "ar": "الْفَجْرُ", "tr": "әл-фажру", "kz": "таң намазы"}, {"id": 183, "cat": "Намаз", "ar": "الْعَصْرُ", "tr": "әл-ғасру", "kz": "екінді намазы"}, {"id": 184, "cat": "Намаз", "ar": "الْمَغْرِبُ", "tr": "әл-мағрибу", "kz": "ақшам намазы"}, {"id": 185, "cat": "Намаз", "ar": "الْعِشَاءُ", "tr": "әл-ғишау", "kz": "құптан намазы"}, {"id": 186, "cat": "Намаз", "ar": "رَكْعَةٌ", "tr": "ракғатун", "kz": "ракағат"}, {"id": 187, "cat": "Намаз", "ar": "قِيَامٌ", "tr": "қиямун", "kz": "қиям"}, {"id": 188, "cat": "Намаз", "ar": "رُكُوعٌ", "tr": "рукуғун", "kz": "рүкүғ"}, {"id": 189, "cat": "Намаз", "ar": "سُجُودٌ", "tr": "сужудун", "kz": "сәжде"}, {"id": 190, "cat": "Намаз", "ar": "جَلْسَةٌ", "tr": "жәлсатун", "kz": "отырыс"}, {"id": 191, "cat": "Намаз", "ar": "تَكْبِيرٌ", "tr": "такбирун", "kz": "тәкбір"}, {"id": 192, "cat": "Намаз", "ar": "تَسْلِيمٌ", "tr": "тәслимун", "kz": "сәлем беру"}, {"id": 193, "cat": "Намаз", "ar": "نِيَّةٌ", "tr": "нийятун", "kz": "ниет"}, {"id": 194, "cat": "Намаз", "ar": "طَهَارَةٌ", "tr": "таһаратун", "kz": "тазалық / дәрет"}, {"id": 195, "cat": "Намаз", "ar": "فَرْضٌ", "tr": "фардун", "kz": "парыз"}, {"id": 196, "cat": "Намаз", "ar": "سُنَّةٌ", "tr": "суннатун", "kz": "сүннет"}, {"id": 197, "cat": "Намаз", "ar": "وَاجِبٌ", "tr": "уажибун", "kz": "уәжіп"}, {"id": 198, "cat": "Намаз", "ar": "سُورَةٌ", "tr": "суратун", "kz": "сүре"}, {"id": 199, "cat": "Намаз", "ar": "آيَةٌ", "tr": "аятун", "kz": "аят"}, {"id": 200, "cat": "Намаз", "ar": "خُشُوعٌ", "tr": "хушуғун", "kz": "ықылас / хушуғ"}, {"id": 201, "cat": "Күнделікті етістіктер", "ar": "ذَهَبَ", "tr": "заһаба", "kz": "барды"}, {"id": 202, "cat": "Күнделікті етістіктер", "ar": "جَاءَ", "tr": "жаа", "kz": "келді"}, {"id": 203, "cat": "Күнделікті етістіктер", "ar": "أَكَلَ", "tr": "әкәлә", "kz": "жеді"}, {"id": 204, "cat": "Күнделікті етістіктер", "ar": "شَرِبَ", "tr": "шариба", "kz": "ішті"}, {"id": 205, "cat": "Күнделікті етістіктер", "ar": "نَامَ", "tr": "нама", "kz": "ұйықтады"}, {"id": 206, "cat": "Күнделікті етістіктер", "ar": "اِسْتَيْقَظَ", "tr": "истайқаза", "kz": "оянды"}, {"id": 207, "cat": "Күнделікті етістіктер", "ar": "جَلَسَ", "tr": "жәләса", "kz": "отырды"}, {"id": 208, "cat": "Күнделікті етістіктер", "ar": "وَقَفَ", "tr": "уақафа", "kz": "тұрды"}, {"id": 209, "cat": "Күнделікті етістіктер", "ar": "فَتَحَ", "tr": "фатаха", "kz": "ашты"}, {"id": 210, "cat": "Күнделікті етістіктер", "ar": "أَغْلَقَ", "tr": "ағлақа", "kz": "жапты"}, {"id": 211, "cat": "Күнделікті етістіктер", "ar": "قَرَأَ", "tr": "қараа", "kz": "оқыды"}, {"id": 212, "cat": "Күнделікті етістіктер", "ar": "كَتَبَ", "tr": "катаба", "kz": "жазды"}, {"id": 213, "cat": "Күнделікті етістіктер", "ar": "سَمِعَ", "tr": "самиға", "kz": "естіді"}, {"id": 214, "cat": "Күнделікті етістіктер", "ar": "تَكَلَّمَ", "tr": "такаллама", "kz": "сөйледі"}, {"id": 215, "cat": "Күнделікті етістіктер", "ar": "رَأَى", "tr": "раа", "kz": "көрді"}, {"id": 216, "cat": "Күнделікті етістіктер", "ar": "عَرَفَ", "tr": "ғарафа", "kz": "білді / таныды"}, {"id": 217, "cat": "Күнделікті етістіктер", "ar": "فَهِمَ", "tr": "фаһима", "kz": "түсінді"}, {"id": 218, "cat": "Күнделікті етістіктер", "ar": "أَخَذَ", "tr": "ахаза", "kz": "алды"}, {"id": 219, "cat": "Күнделікті етістіктер", "ar": "أَعْطَى", "tr": "ағта", "kz": "берді"}, {"id": 220, "cat": "Күнделікті етістіктер", "ar": "عَمِلَ", "tr": "ғамила", "kz": "жұмыс істеді"}, {"id": 221, "cat": "Сын есімдер", "ar": "كَبِيرٌ", "tr": "кабирун", "kz": "үлкен"}, {"id": 222, "cat": "Сын есімдер", "ar": "صَغِيرٌ", "tr": "сағирун", "kz": "кіші"}, {"id": 223, "cat": "Сын есімдер", "ar": "طَوِيلٌ", "tr": "тауилун", "kz": "ұзын"}, {"id": 224, "cat": "Сын есімдер", "ar": "قَصِيرٌ", "tr": "қасирун", "kz": "қысқа"}, {"id": 225, "cat": "Сын есімдер", "ar": "جَدِيدٌ", "tr": "жәдидун", "kz": "жаңа"}, {"id": 226, "cat": "Сын есімдер", "ar": "قَدِيمٌ", "tr": "қадимун", "kz": "ескі"}, {"id": 227, "cat": "Сын есімдер", "ar": "جَمِيلٌ", "tr": "жәмилун", "kz": "әдемі"}, {"id": 228, "cat": "Сын есімдер", "ar": "قَبِيحٌ", "tr": "қабихун", "kz": "ұсқынсыз"}, {"id": 229, "cat": "Сын есімдер", "ar": "سَرِيعٌ", "tr": "сариғун", "kz": "жылдам"}, {"id": 230, "cat": "Сын есімдер", "ar": "بَطِيءٌ", "tr": "батиун", "kz": "баяу"}, {"id": 231, "cat": "Сын есімдер", "ar": "سَهْلٌ", "tr": "сәһлун", "kz": "оңай"}, {"id": 232, "cat": "Сын есімдер", "ar": "صَعْبٌ", "tr": "сағбун", "kz": "қиын"}, {"id": 233, "cat": "Сын есімдер", "ar": "حَارٌّ", "tr": "харрун", "kz": "ыстық"}, {"id": 234, "cat": "Сын есімдер", "ar": "بَارِدٌ", "tr": "баридун", "kz": "суық"}, {"id": 235, "cat": "Сын есімдер", "ar": "نَظِيفٌ", "tr": "назифун", "kz": "таза"}, {"id": 236, "cat": "Сын есімдер", "ar": "مُتَّسِخٌ", "tr": "муттасихун", "kz": "лас"}, {"id": 237, "cat": "Сын есімдер", "ar": "قَوِيٌّ", "tr": "қауийюн", "kz": "күшті"}, {"id": 238, "cat": "Сын есімдер", "ar": "ضَعِيفٌ", "tr": "дағифун", "kz": "әлсіз"}, {"id": 239, "cat": "Сын есімдер", "ar": "سَعِيدٌ", "tr": "сағидун", "kz": "бақытты"}, {"id": 240, "cat": "Сын есімдер", "ar": "حَزِينٌ", "tr": "хазинун", "kz": "мұңды"}, {"id": 241, "cat": "Дене", "ar": "رَأْسٌ", "tr": "раъсун", "kz": "бас"}, {"id": 242, "cat": "Дене", "ar": "وَجْهٌ", "tr": "уажһун", "kz": "бет"}, {"id": 243, "cat": "Дене", "ar": "عَيْنٌ", "tr": "ғайнуң", "kz": "көз"}, {"id": 244, "cat": "Дене", "ar": "أُذُنٌ", "tr": "узунун", "kz": "құлақ"}, {"id": 245, "cat": "Дене", "ar": "أَنْفٌ", "tr": "анфун", "kz": "мұрын"}, {"id": 246, "cat": "Дене", "ar": "فَمٌ", "tr": "фамун", "kz": "ауыз"}, {"id": 247, "cat": "Дене", "ar": "سِنٌّ", "tr": "синнун", "kz": "тіс"}, {"id": 248, "cat": "Дене", "ar": "لِسَانٌ", "tr": "лисанун", "kz": "тіл"}, {"id": 249, "cat": "Дене", "ar": "يَدٌ", "tr": "ядун", "kz": "қол"}, {"id": 250, "cat": "Дене", "ar": "إِصْبَعٌ", "tr": "исбағун", "kz": "саусақ"}, {"id": 251, "cat": "Дене", "ar": "ذِرَاعٌ", "tr": "зирағун", "kz": "білек / қол"}, {"id": 252, "cat": "Дене", "ar": "رِجْلٌ", "tr": "рижлун", "kz": "аяқ"}, {"id": 253, "cat": "Дене", "ar": "قَدَمٌ", "tr": "қадамун", "kz": "табан / аяқ"}, {"id": 254, "cat": "Дене", "ar": "قَلْبٌ", "tr": "қалбун", "kz": "жүрек"}, {"id": 255, "cat": "Дене", "ar": "بَطْنٌ", "tr": "батнун", "kz": "іш"}, {"id": 256, "cat": "Дене", "ar": "ظَهْرٌ", "tr": "заһрун", "kz": "арқа"}, {"id": 257, "cat": "Дене", "ar": "شَعْرٌ", "tr": "шағрун", "kz": "шаш"}, {"id": 258, "cat": "Дене", "ar": "دَمٌ", "tr": "дамун", "kz": "қан"}, {"id": 259, "cat": "Дене", "ar": "جِسْمٌ", "tr": "жисмун", "kz": "дене"}, {"id": 260, "cat": "Дене", "ar": "صِحَّةٌ", "tr": "сиххатун", "kz": "денсаулық"}, {"id": 261, "cat": "Табиғат", "ar": "شَمْسٌ", "tr": "шамсун", "kz": "күн"}, {"id": 262, "cat": "Табиғат", "ar": "قَمَرٌ", "tr": "қамарун", "kz": "ай"}, {"id": 263, "cat": "Табиғат", "ar": "نَجْمٌ", "tr": "нажмун", "kz": "жұлдыз"}, {"id": 264, "cat": "Табиғат", "ar": "سَمَاءٌ", "tr": "самаун", "kz": "аспан"}, {"id": 265, "cat": "Табиғат", "ar": "تُرَابٌ", "tr": "турабун", "kz": "топырақ"}, {"id": 266, "cat": "Табиғат", "ar": "بَحْرٌ", "tr": "бахрун", "kz": "теңіз"}, {"id": 267, "cat": "Табиғат", "ar": "نَهْرٌ", "tr": "наһрун", "kz": "өзен"}, {"id": 268, "cat": "Табиғат", "ar": "جَبَلٌ", "tr": "жәбалун", "kz": "тау"}, {"id": 269, "cat": "Табиғат", "ar": "شَجَرَةٌ", "tr": "шажаратун", "kz": "ағаш"}, {"id": 270, "cat": "Табиғат", "ar": "زَهْرَةٌ", "tr": "заһратун", "kz": "гүл"}, {"id": 271, "cat": "Табиғат", "ar": "مَطَرٌ", "tr": "матарун", "kz": "жаңбыр"}, {"id": 272, "cat": "Табиғат", "ar": "ثَلْجٌ", "tr": "салжун", "kz": "қар"}, {"id": 273, "cat": "Табиғат", "ar": "رِيحٌ", "tr": "рихун", "kz": "жел"}, {"id": 274, "cat": "Табиғат", "ar": "سَحَابٌ", "tr": "сахабун", "kz": "бұлт"}, {"id": 275, "cat": "Табиғат", "ar": "نَارٌ", "tr": "нарун", "kz": "от"}, {"id": 276, "cat": "Табиғат", "ar": "هَوَاءٌ", "tr": "һауаун", "kz": "ауа"}, {"id": 277, "cat": "Табиғат", "ar": "حَيَوَانٌ", "tr": "хайауанун", "kz": "жануар"}, {"id": 278, "cat": "Табиғат", "ar": "طَائِرٌ", "tr": "тааирун", "kz": "құс"}, {"id": 279, "cat": "Табиғат", "ar": "قِطٌّ", "tr": "қиттун", "kz": "мысық"}, {"id": 280, "cat": "Табиғат", "ar": "كَلْبٌ", "tr": "калбун", "kz": "ит"}, {"id": 281, "cat": "Күнделікті заттар", "ar": "كِتَابٌ", "tr": "китабун", "kz": "кітап"}, {"id": 282, "cat": "Күнделікті заттар", "ar": "قَلَمٌ", "tr": "қаламун", "kz": "қалам"}, {"id": 283, "cat": "Күнделікті заттар", "ar": "دَفْتَرٌ", "tr": "дафтарун", "kz": "дәптер"}, {"id": 284, "cat": "Күнделікті заттар", "ar": "وَرَقَةٌ", "tr": "уарақатун", "kz": "қағаз"}, {"id": 285, "cat": "Күнделікті заттар", "ar": "هَاتِفٌ", "tr": "һатифун", "kz": "телефон"}, {"id": 286, "cat": "Күнделікті заттар", "ar": "حَاسُوبٌ", "tr": "хасубун", "kz": "компьютер"}, {"id": 287, "cat": "Күнделікті заттар", "ar": "نَظَّارَةٌ", "tr": "наззаратун", "kz": "көзілдірік"}, {"id": 288, "cat": "Күнделікті заттар", "ar": "حَقِيبَةٌ", "tr": "хақибатун", "kz": "сөмке"}, {"id": 289, "cat": "Күнделікті заттар", "ar": "مِلْعَقَةٌ", "tr": "милғақатун", "kz": "қасық"}, {"id": 290, "cat": "Күнделікті заттар", "ar": "شَوْكَةٌ", "tr": "шаукатун", "kz": "шанышқы"}, {"id": 291, "cat": "Күнделікті заттар", "ar": "سِكِّينٌ", "tr": "сиккинуң", "kz": "пышақ"}, {"id": 292, "cat": "Күнделікті заттар", "ar": "كُوبٌ", "tr": "кубун", "kz": "кесе"}, {"id": 293, "cat": "Күнделікті заттар", "ar": "صَحْنٌ", "tr": "сахнун", "kz": "тәрелке"}, {"id": 294, "cat": "Күнделікті заттар", "ar": "مَلَابِسُ", "tr": "мәләәбису", "kz": "киім"}, {"id": 295, "cat": "Күнделікті заттар", "ar": "قَمِيصٌ", "tr": "қамисун", "kz": "көйлек / жейде"}, {"id": 296, "cat": "Күнделікті заттар", "ar": "حِذَاءٌ", "tr": "хизаун", "kz": "аяқ киім"}, {"id": 297, "cat": "Күнделікті заттар", "ar": "مَنْشَفَةٌ", "tr": "маншафатун", "kz": "сүлгі"}, {"id": 298, "cat": "Күнделікті заттар", "ar": "صَابُونٌ", "tr": "сабунун", "kz": "сабын"}, {"id": 299, "cat": "Күнделікті заттар", "ar": "مِرْآةٌ", "tr": "миръатун", "kz": "айна"}, {"id": 300, "cat": "Күнделікті заттар", "ar": "شَاحِنٌ", "tr": "шахинун", "kz": "қуаттағыш"}];
+const DIALOGS = [["Сәлемдесу", "السَّلَامُ عَلَيْكُمْ.\nوَعَلَيْكُمُ السَّلَامُ.", "Ассалаумағалейкум.\nУағалейкумассалам."], ["Хал сұрау", "كَيْفَ حَالُكَ؟\nبِخَيْرٍ، الْحَمْدُ لِلّٰهِ.", "Халің қалай?\nЖақсы, Аллаға шүкір."], ["Танысу", "مَا اسْمُكَ؟\nاِسْمِي أَبْزَالُ.", "Атың кім?\nМенің атым Абзал."], ["Мешітті сұрау", "أَيْنَ الْمَسْجِدُ؟\nالْمَسْجِدُ هُنَاكَ.", "Мешіт қайда?\nМешіт ана жерде."], ["Дүкенде", "كَمْ هٰذَا؟\nهٰذَا بِأَلْفِ تَنْغِي.", "Мынау қанша?\nБұл мың теңге."], ["Су сұрау", "أُرِيدُ مَاءً، مِنْ فَضْلِكَ.\nتَفَضَّلْ.", "Су беріңізші.\nМіне, алыңыз."], ["Шай", "هَلْ تُرِيدُ شَايًا؟\nنَعَمْ، شُكْرًا.", "Шай қалайсыз ба?\nИә, рақмет."], ["Жол сұрау", "أَيْنَ الطَّرِيقُ إِلَى الْمَطَارِ؟\nاِذْهَبْ مُسْتَقِيمًا.", "Әуежайға жол қайда?\nТура жүріңіз."], ["Оңға бұрылу", "هَلْ أَذْهَبُ يَمِينًا؟\nنَعَمْ، ثُمَّ مُسْتَقِيمًا.", "Оңға барамын ба?\nИә, сосын тура."], ["Сағат", "كَمِ السَّاعَةُ؟\nالسَّاعَةُ خَمْسَةٌ.", "Сағат қанша?\nСағат бес."], ["Бүгін", "مَاذَا تَفْعَلُ الْيَوْمَ؟\nأَعْمَلُ الْيَوْمَ.", "Бүгін не істейсің?\nБүгін жұмыс істеймін."], ["Ертең", "مَتَى السَّفَرُ؟\nغَدًا إِنْ شَاءَ اللّٰهُ.", "Сапар қашан?\nЕртең, иншаАллаһ."], ["Отбасы", "هٰذِهِ أُسْرَتِي.\nمَا شَاءَ اللّٰهُ.", "Бұл менің отбасым.\nМашаАллаһ."], ["Әке", "أَيْنَ أَبُوكَ؟\nهُوَ فِي الْبَيْتِ.", "Әкең қайда?\nОл үйде."], ["Ана", "أَيْنَ أُمُّكَ؟\nهِيَ فِي الْمَطْبَخِ.", "Анаң қайда?\nОл ас үйде."], ["Құран", "هَلْ تَقْرَأُ الْقُرْآنَ؟\nنَعَمْ، أَقْرَأُهُ كُلَّ يَوْمٍ.", "Құран оқисың ба?\nИә, күнде оқимын."], ["Намаз", "هَلْ صَلَّيْتَ الْفَجْرَ؟\nنَعَمْ، الْحَمْدُ لِلّٰهِ.", "Таң намазын оқыдың ба?\nИә, Аллаға шүкір."], ["Дәрет", "أَيْنَ مَكَانُ الْوُضُوءِ؟\nهُنَاكَ.", "Дәрет алатын жер қайда?\nАна жерде."], ["Тағам", "هَلِ الطَّعَامُ جَاهِزٌ؟\nنَعَمْ، تَفَضَّلْ.", "Тамақ дайын ба?\nИә, келіңіз."], ["Нан", "هَلْ عِنْدَكَ خُبْزٌ؟\nنَعَمْ، عِنْدِي خُبْزٌ.", "Наның бар ма?\nИә, наным бар."], ["Кофе", "أُرِيدُ قَهْوَةً بِلَا سُكَّرٍ.\nحَسَنًا.", "Қантсыз кофе қалаймын.\nЖарайды."], ["Бөлме", "أَيْنَ غُرْفَتِي؟\nغُرْفَتُكَ فِي الطَّابِقِ الثَّانِي.", "Менің бөлмем қайда?\nБөлмең екінші қабатта."], ["Кілт", "أَيْنَ الْمِفْتَاحُ؟\nالْمِفْتَاحُ عَلَى الطَّاوِلَةِ.", "Кілт қайда?\nКілт үстелдің үстінде."], ["Телефон", "أَيْنَ هَاتِفِي؟\nهَاتِفُكَ فِي الْحَقِيبَةِ.", "Телефоным қайда?\nТелефоның сөмкеде."], ["Билет", "أُرِيدُ تَذْكِرَةً إِلَى أَسْتَانَا.\nذَهَابًا فَقَطْ؟", "Астанаға билет керек.\nТек бір бағытқа ма?"], ["Қонақүй", "أَيْنَ الْفُنْدُقُ؟\nقَرِيبٌ مِنْ هُنَا.", "Қонақүй қайда?\nОсы жерге жақын."], ["Баға", "السِّعْرُ غَالٍ.\nهَلْ عِنْدَكُمْ خَصْمٌ؟", "Бағасы қымбат.\nЖеңілдік бар ма?"], ["Өлшем", "هَلْ عِنْدَكُمْ مَقَاسٌ أَكْبَرُ؟\nنَعَمْ.", "Үлкенірек өлшем бар ма?\nИә."], ["Кешірім", "آسِفٌ، لَمْ أَفْهَمْ.\nلَا بَأْسَ.", "Кешіріңіз, түсінбедім.\nЕштеңе етпейді."], ["Қоштасу", "مَعَ السَّلَامَةِ.\nإِلَى اللِّقَاءِ.", "Сау болыңыз.\nКездескенше."]].map((x,i)=>({id:i+1,title:x[0],ar:x[1],kz:x[2]}));
+const KEY='arabsha_v1';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{xp:0,known:[],difficult:[],days:{},streak:0,lastDay:null};
+let lesson=[], lessonPos=0, currentQuiz=null, quizLocked=false;
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state)); renderStats()}
+function today(){return new Date().toISOString().slice(0,10)}
+function hashDate(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function seededShuffle(arr,seed){let a=[...arr],x=seed||1;for(let i=a.length-1;i>0;i--){x=(x*1664525+1013904223)>>>0;let j=x%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function dailyWords(){return seededShuffle(WORDS,hashDate(today())).slice(0,10)}
+function dailyDone(){let ids=state.days[today()]||[];return ids.length}
+function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500)}
+
+function renderStats(){
+  document.getElementById('xp').textContent=state.xp||0;
+  document.getElementById('streak').textContent=(state.streak||0)+' 🔥';
+  document.getElementById('known').textContent=(new Set(state.known||[]).size)+'/300';
+  document.getElementById('levelBadge').textContent=(Math.floor((state.xp||0)/250)+1)+'-деңгей';
+  const done=dailyDone(); document.getElementById('dailyDone').textContent=done;
+  document.getElementById('dailyBar').style.width=Math.min(100,done*10)+'%';
+  document.getElementById('repeatCount').textContent=(state.difficult||[]).length+' қиын сөз';
+}
+function updateStreak(){
+  const d=today(); if(state.lastDay===d)return;
+  const prev=new Date();prev.setDate(prev.getDate()-1);const p=prev.toISOString().slice(0,10);
+  state.streak = state.lastDay===p ? (state.streak||0)+1 : 1; state.lastDay=d;
+}
+function renderCats(){
+  const box=document.getElementById('catList'); box.innerHTML='';
+  const ks=[...new Set(WORDS.map(w=>w.cat))];
+  ks.forEach(k=>{let all=WORDS.filter(w=>w.cat===k), known=all.filter(w=>state.known.includes(w.id)).length;
+    box.insertAdjacentHTML('beforeend',`<div class="cat"><div><b>${k}</b><div class="muted">${known}/${all.length} меңгерілді</div></div><span class="pill">${all.length} сөз</span></div>`)});
+}
+function go(id){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
+  if(id==='home'){renderStats();renderCats()}
+  if(id==='words')renderWords();
+  if(id==='dialogs')renderDialogs();
+  if(id==='saved')renderSaved();
+  if(id==='quiz')newQuiz();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function startLesson(){
+  const doneIds=state.days[today()]||[];
+  lesson=dailyWords().filter(w=>!doneIds.includes(w.id));
+  if(!lesson.length){toast('Бүгінгі 10 сөз аяқталды ✅'); go('quiz'); return}
+  lessonPos=0; showLesson(); go('lesson');
+}
+function startDifficult(){
+  lesson=WORDS.filter(w=>state.difficult.includes(w.id));
+  if(!lesson.length){toast('Қиын сөздер әзірге жоқ 👍'); return}
+  lessonPos=0; showLesson(); go('lesson');
+}
+function showLesson(){
+  const w=lesson[lessonPos]; if(!w){toast('Сабақ аяқталды 🎉'); go('home'); return}
+  lessonCat.textContent=w.cat; lessonAr.textContent=w.ar; lessonTr.textContent=w.tr; lessonKz.textContent=w.kz;
+  lessonIndex.textContent=lessonPos+1; lessonTotal.textContent=lesson.length;
+}
+function speak(text){ if(!('speechSynthesis' in window)){toast('Бұл құрылғыда дыбыстау қолжетімсіз');return}
+  speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.72;speechSynthesis.speak(u)}
+function speakCurrent(){const w=lesson[lessonPos]; if(w)speak(w.ar)}
+function finishOne(w,known){
+  let ids=state.days[today()]||[];
+  if(dailyWords().some(x=>x.id===w.id) && !ids.includes(w.id)){ids.push(w.id);state.days[today()]=ids}
+  if(known){
+    if(!state.known.includes(w.id))state.known.push(w.id);
+    state.difficult=state.difficult.filter(id=>id!==w.id);
+    state.xp=(state.xp||0)+10;
+  }else if(!state.difficult.includes(w.id)) state.difficult.push(w.id);
+  if((state.days[today()]||[]).length>=10) updateStreak();
+  save(); lessonPos++; showLesson();
+}
+function markKnown(){const w=lesson[lessonPos]; if(w)finishOne(w,true)}
+function markRepeat(){const w=lesson[lessonPos]; if(w)finishOne(w,false)}
+
+function newQuiz(){
+  currentQuiz=WORDS[Math.floor(Math.random()*WORDS.length)]; quizLocked=false;
+  quizAr.textContent=currentQuiz.ar;
+  let wrong=seededShuffle(WORDS.filter(w=>w.id!==currentQuiz.id),Math.floor(Math.random()*1e9)).slice(0,3);
+  let opts=seededShuffle([currentQuiz,...wrong],Math.floor(Math.random()*1e9));
+  quizOptions.innerHTML=opts.map(w=>`<button class="quizopt" data-id="${w.id}" onclick="chooseQuiz(this,${w.id})">${w.kz}</button>`).join('');
+  quizNext.style.display='none';
+  const tw=WORDS[Math.floor(Math.random()*WORDS.length)]; typeKz.textContent=tw.kz; typeInput.value='';typeInput.dataset.id=tw.id;typeResult.textContent='';
+}
+function chooseQuiz(btn,id){
+  if(quizLocked)return; quizLocked=true;
+  document.querySelectorAll('.quizopt').forEach(b=>{if(+b.dataset.id===currentQuiz.id)b.classList.add('good')});
+  if(id===currentQuiz.id){state.xp+=5;btn.classList.add('good');toast('+5 XP ✅')}
+  else{btn.classList.add('bad');if(!state.difficult.includes(currentQuiz.id))state.difficult.push(currentQuiz.id)}
+  save(); quizNext.style.display='block';
+}
+function nextQuiz(){newQuiz()}
+function stripMarks(s){return (s||'').normalize('NFD').replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g,'').replace(/\s+/g,' ').trim()}
+function checkTyped(){
+  let w=WORDS.find(x=>x.id===+typeInput.dataset.id), a=stripMarks(typeInput.value), b=stripMarks(w.ar);
+  if(a===b){typeResult.innerHTML='<b style="color:#16803c">Дұрыс ✅</b>';state.xp+=8;save()}
+  else{typeResult.innerHTML=`<span style="color:#b42318">Дұрыс жауабы: <b dir="rtl">${w.ar}</b></span>`;if(!state.difficult.includes(w.id))state.difficult.push(w.id);save()}
+}
+function renderWords(){
+  let q=(search.value||'').toLowerCase().trim(), arr=WORDS.filter(w=>!q||w.ar.includes(q)||w.tr.toLowerCase().includes(q)||w.kz.toLowerCase().includes(q)||w.cat.toLowerCase().includes(q));
+  wordList.innerHTML=arr.map(w=>`<div class="listword"><div class="ar">${w.ar}</div><div><b>${w.kz}</b><div class="muted">${w.tr}</div></div><div><span class="pill">${w.cat}</span> ${state.difficult.includes(w.id)?'<span class="tag">қиын</span>':''}</div></div>`).join('');
+}
+function renderDialogs(){
+  dialogList.innerHTML=DIALOGS.map(d=>`<div class="panel dialog"><div class="toprow"><h3>${d.id}. ${d.title}</h3><button class="btn secondary" onclick='speak(${JSON.stringify(d.ar)})'>🔊</button></div><div class="ar">${d.ar.replaceAll('\n','<br>')}</div><hr style="border:0;border-top:1px solid var(--line)"><div>${d.kz.replaceAll('\n','<br>')}</div></div>`).join('');
+}
+function renderSaved(){
+  let arr=WORDS.filter(w=>state.difficult.includes(w.id));
+  savedList.innerHTML=arr.length?arr.map(w=>`<div class="listword"><div class="ar">${w.ar}</div><div><b>${w.kz}</b><div class="muted">${w.tr}</div></div><button class="btn secondary" onclick="removeDiff(${w.id})">Меңгердім</button></div>`).join(''):'<div class="center muted">Қиын сөздер жоқ. Жарайсың 👍</div>';
+}
+function removeDiff(id){state.difficult=state.difficult.filter(x=>x!==id); if(!state.known.includes(id))state.known.push(id); state.xp+=10;save();renderSaved()}
+renderStats();renderCats();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
